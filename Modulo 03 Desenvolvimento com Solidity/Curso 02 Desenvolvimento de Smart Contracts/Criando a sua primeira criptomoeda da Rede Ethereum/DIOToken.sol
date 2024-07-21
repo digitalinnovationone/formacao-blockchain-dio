@@ -16,10 +16,10 @@ interface IERC20{
     event Approval(address indexed owner, address indexed spender, uint256);
 
 }
-
+//informações do contrato
 contract DIOToken is IERC20{
 
-    string public constant name = "DIO Token";
+    string public constant name = "Marcos DIO Token";
     string public constant symbol = "DIO";
     uint8 public constant decimals = 18;
 
