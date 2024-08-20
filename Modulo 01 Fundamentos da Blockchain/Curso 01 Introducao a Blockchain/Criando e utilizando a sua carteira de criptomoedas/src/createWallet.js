@@ -27,7 +27,24 @@ let btcAddress = bitcoin.payments.p2pkh({
     network: network,
 }).address
 
+//verificar qual é a rede
+let msgNetWork = ""
+switch (network) {
+  case bitcoin.networks.testnet:
+    msgNetWork = "testnet"
+    break
+  case bitcoin.networks.bitcoin:
+    msgNetWork = "mainnet"
+    break
+  case bitcoin.networks.regtest:
+    msgNetWork = "regtest"
+    break
+  default:
+    msgNetWork = "Rede desconhecida"
+}
+
 console.log("Carteira gerada")
+console.log("Rede: ", msgNetWork)
 console.log("Endereço: ", btcAddress)
 console.log("Chave privada:", node.toWIF())
 console.log("Seed:", mnemonic)
