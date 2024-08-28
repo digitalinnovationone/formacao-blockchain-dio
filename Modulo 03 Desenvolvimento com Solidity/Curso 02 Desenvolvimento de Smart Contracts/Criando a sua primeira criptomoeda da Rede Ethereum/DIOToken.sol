@@ -61,10 +61,10 @@ contract DIOToken is IERC20{
 
     function transferFrom(address owner, address buyer, uint256 numTokens) public override returns (bool) {
         require(numTokens <= balances[owner]);
-        require(numTokens <= allowed[owner][msg.sender]);
+        require(numTokens <= allowed[msg.sender][owner]);
 
         balances[owner] = balances[owner]-numTokens;
-        allowed[owner][msg.sender] = allowed[owner][msg.sender]-numTokens;
+        allowed[msg.sender][owner] = allowed[msg.sender][owner]-numTokens;
         balances[buyer] = balances[buyer]+numTokens;
         emit Transfer(owner, buyer, numTokens);
         return true;
