@@ -1,0 +1,187 @@
+version: '3.8'
+
+# =====================================================
+# DOCKER COMPOSE - TESTNET MODE
+# =====================================================
+#
+# Configuração otimizada para Arbitrum Sepolia testnet
+#
+# Uso:
+#   docker compose -f docker-compose.testnet.yml up -d
+#   docker compose -f docker-compose.testnet.yml logs -f
+#   docker compose -f docker-compose.testnet.yml down
+#
+# =====================================================
+
+services:
+  # ===================================================
+  # KEEPER BOT - TESTNET
+  # ===================================================
+  keeper-testnet:
+    build:
+      context: .
+      dockerfile: Dockerfile
+
+    container_name: deltaneutral-keeper-testnet
+
+    # Sempre reiniciar (exceto se parado manualmente)
+    restart: unless-stopped
+
+    # Variáveis de ambiente (sobrescrevem .env)
+    environment:
+      # Modo de operação
+      - DRY_RUN=true  # 🔒 SEMPRE dry run primeiro!
+
+      # Testnet específico
+      - CHECK_INTERVAL_MS=30000  # 30s para feedback rápido
+      - MAX_ORACLE_DEVIATION_BPS=1000  # 10% relaxado
+      - LOG_LEVEL=debug  # Logs verbosos
+      - ENABLE_DEBUG_FUNCTIONS=true
+      - SHOW_GAS_ESTIMATES=true
+      - SIMULATE_BEFORE_SEND=true
+
+      # Network
+      - CHAIN_ID=421614
+      - ARBITRUM_SEPOLIA_RPC_URL=${ARBITRUM_SEPOLIA_RPC_URL}
+
+      # Vault & Oracles
+      - VAULT_ADDRESS=${VAULT_ADDRESS}
+      - CHAINLINK_FEED_ADDRESS=0x56a43EB56Da12C0dc1D972ACb089c06a5dEF8e69
+      - PYTH_HERMES_URL=https://hermes.pyth.network
+      - PYTH_PRICE_ID_BTC=0xe62df6c8b4a85fe1a67db44dc12de5db330f7ac66b72dc658afedf0f4a415b43
+
+      # Security
+      - PRIVATE_KEY=${PRIVATE_KEY}
+      - MAX_GAS_PRICE_GWEI=100
+
+      # Health checks
+      - ENABLE_HEALTH_CHECK=true
+      - HEALTH_CHECK_INTERVAL_MS=300000
+
+      # Logging
+      - LOG_TO_FILE=true
+      - LOG_DIR=/app/logs
+
+    # Ler .env adicional (se existir)
+    env_file:
+      - keeper-bot/.env.testnet
+
+    # Volumes para persistir logs
+    volumes:
+      - ./keeper-bot/logs:/app/logs
+      - ./keeper-bot/data:/app/data  # Para salvar estado se necessário
+
+    # Network customizada
+    networks:
+      - testnet-network
+
+    # Health check do container
+    healthcheck:
+      test: ["CMD", "node", "-e", "console.log('OK')"]
+      interval: 60s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+    # Limites de recursos (ajustados para testnet)
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+        reservations:
+          cpus: '0.25'
+          memory: 256M
+
+    # Logging do Docker
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+    # Labels para organização
+    labels:
+      - "app=deltaneutral-vault"
+      - "component=keeper"
+      - "environment=testnet"
+      - "network=arbitrum-sepolia"
+
+  # ===================================================
+  # MONITOR (OPCIONAL) - Dashboard simples
+  # ===================================================
+  monitor-testnet:
+    image: nginx:alpine
+    container_name: deltaneutral-monitor-testnet
+
+    restart: unless-stopped
+
+    # Expor dashboard na porta 8080
+    ports:
+      - "8080:80"
+
+    # Servir logs como HTML
+    volumes:
+      - ./keeper-bot/logs:/usr/share/nginx/html/logs:ro
+      - ./monitoring/nginx.conf:/etc/nginx/nginx.conf:ro
+
+    networks:
+      - testnet-network
+
+    depends_on:
+      - keeper-testnet
+
+    labels:
+      - "app=deltaneutral-vault"
+      - "component=monitor"
+      - "environment=testnet"
+
+# ===================================================
+# NETWORKS
+# ===================================================
+networks:
+  testnet-network:
+    driver: bridge
+    name: deltaneutral-testnet
+
+# ===================================================
+# VOLUMES (OPCIONAL)
+# ===================================================
+volumes:
+  keeper-logs:
+    name: deltaneutral-keeper-logs-testnet
+  keeper-data:
+    name: deltaneutral-keeper-data-testnet
+
+# =====================================================
+# COMANDOS ÚTEIS
+# =====================================================
+#
+# Iniciar:
+#   docker compose -f docker-compose.testnet.yml up -d
+#
+# Ver logs (real-time):
+#   docker compose -f docker-compose.testnet.yml logs -f keeper-testnet
+#
+# Parar:
+#   docker compose -f docker-compose.testnet.yml down
+#
+# Reiniciar:
+#   docker compose -f docker-compose.testnet.yml restart keeper-testnet
+#
+# Ver status:
+#   docker compose -f docker-compose.testnet.yml ps
+#
+# Entrar no container:
+#   docker compose -f docker-compose.testnet.yml exec keeper-testnet sh
+#
+# Ver logs salvos:
+#   cat keeper-bot/logs/combined.log
+#
+# Limpar tudo:
+#   docker compose -f docker-compose.testnet.yml down -v
+#
+# Rebuild (após mudanças no código):
+#   docker compose -f docker-compose.testnet.yml up -d --build
+#
+# =====================================================

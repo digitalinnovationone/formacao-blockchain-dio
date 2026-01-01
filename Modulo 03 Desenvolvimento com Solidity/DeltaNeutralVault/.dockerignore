@@ -1,0 +1,28 @@
+# Node
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# Hardhat
+artifacts/
+cache/
+typechain/
+typechain-types/
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Git
+.git/
+.gitignore
+
+# Documentação
+*.md
+!README.md
+
+# Outros
+.DS_Store
+*.log
+deployment.json

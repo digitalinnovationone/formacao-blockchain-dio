@@ -1,0 +1,60 @@
+[profile.default]
+src = "."
+out = "out"
+libs = ["node_modules"]
+test = "test"
+cache_path = "cache_forge"
+
+# Remappings para imports
+remappings = [
+    "@openzeppelin/=node_modules/@openzeppelin/",
+    "@chainlink/=node_modules/@chainlink/",
+    "@uniswap/v3-core/=node_modules/@uniswap/v3-core/",
+    "@uniswap/v3-periphery/=node_modules/@uniswap/v3-periphery/"
+]
+
+# Solidity version
+solc_version = "0.8.20"
+
+# Optimizer
+optimizer = true
+optimizer_runs = 200
+
+# EVM version
+evm_version = "paris"
+
+# Verbosity
+verbosity = 2
+
+# Gas reports
+gas_reports = ["*"]
+
+# Fuzz
+[fuzz]
+runs = 256
+max_test_rejects = 65536
+
+# Invariant
+[invariant]
+runs = 256
+depth = 15
+fail_on_revert = true
+
+# RPC endpoints
+[rpc_endpoints]
+sepolia = "${SEPOLIA_RPC_URL}"
+mainnet = "${MAINNET_RPC_URL}"
+arbitrum_sepolia = "${ARBITRUM_SEPOLIA_RPC_URL}"
+arbitrum_sepolia_public = "https://sepolia-rollup.arbitrum.io/rpc"
+
+# Etherscan (para verificação)
+[etherscan]
+sepolia = { key = "${ETHERSCAN_API_KEY}" }
+mainnet = { key = "${ETHERSCAN_API_KEY}" }
+arbitrum_sepolia = { key = "${ARBISCAN_API_KEY}", url = "https://api-sepolia.arbiscan.io/api" }
+
+# Formatter
+[fmt]
+line_length = 120
+tab_width = 4
+bracket_spacing = true

@@ -1,0 +1,26 @@
+{
+  "name": "delta-neutral-vault-v1",
+  "version": "1.0.0",
+  "description": "Delta Neutral Vault - ERC-4626 vault for delta-neutral strategies on Uniswap v3",
+  "author": "DIO Blockchain Formation",
+  "license": "MIT",
+  "scripts": {
+    "compile": "hardhat compile",
+    "test": "hardhat test",
+    "deploy": "hardhat run scripts/deploy.js",
+    "deploy:airbithon": "hardhat run scripts/deploy.js --network airbithon",
+    "deploy:sepolia": "hardhat run scripts/deploy.js --network sepolia",
+    "clean": "hardhat clean"
+  },
+  "devDependencies": {
+    "@nomicfoundation/hardhat-toolbox": "^4.0.0",
+    "hardhat": "^2.19.0",
+    "dotenv": "^16.3.1"
+  },
+  "dependencies": {
+    "@openzeppelin/contracts": "^5.0.1",
+    "@chainlink/contracts": "^0.8.0",
+    "@uniswap/v3-core": "^1.0.1",
+    "@uniswap/v3-periphery": "^1.4.4"
+  }
+}
